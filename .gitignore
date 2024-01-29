@@ -1,0 +1,6 @@
+*.agdai
+*~
+
+cleanup
+
+html/
