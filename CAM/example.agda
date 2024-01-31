@@ -4,7 +4,7 @@ open import Data.List
 
 open import CAM.term
 open import CAM.config
-open import CAM.inst
+open import CAM.catCombProps
 open import CAM.runNonTerminating
 
 open Utils
@@ -17,4 +17,3 @@ inst1 = compile ex1
 
 x : Result
 x = run ⟨ inst1 ∣ ⟨⟩ ∣ [] ⟩
-

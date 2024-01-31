@@ -2,31 +2,29 @@ module CAM.step where
 
 open import Data.List
 
-open import CAM.inst
+open import CAM.inst public
 open import CAM.config public
-open import CAM.value
+open import CAM.value public
 
 data CAM-step : Config → Config → Set where
-  natE-red : ∀ {C S x} →      CAM-step ⟨ (NAT x) ∷ C ∣ ⟨⟩ ∣ S ⟩       ⟨ C ∣ `nat x ∣ S ⟩
-  nat-red :  ∀ {C s S x} →    CAM-step ⟨ (NAT x) ∷ C ∣ s ∣ S ⟩        ⟨ C ∣ s , `nat x ∣ S ⟩
-  skip-red : ∀ {C s S} →      CAM-step ⟨ SKIP ∷ C ∣ s ∣ S ⟩           ⟨ C ∣ s ∣ S ⟩ 
-  car-red  : ∀ {C s₁ s₂ S} →  CAM-step ⟨ CAR ∷ C ∣ s₁ , s₂ ∣ S ⟩      ⟨ C ∣ s₁ ∣ S ⟩
-  cdr-red  : ∀ {C s₁ s₂ S} →  CAM-step ⟨ CDR ∷ C ∣ s₁ , s₂ ∣ S ⟩      ⟨ C ∣ s₂ ∣ S ⟩
-  push-red : ∀ {C s S} →      CAM-step ⟨ PUSH ∷ C ∣ s ∣ S ⟩           ⟨ C ∣ s ∣ s ∷ S ⟩
-  swap-red : ∀ {C s₁ s₂ S} →  CAM-step ⟨ SWAP ∷ C ∣ s₁ ∣ s₂ ∷ S ⟩     ⟨ C ∣ s₂ ∣ s₁ ∷ S ⟩
-  cons-red : ∀ {C s₁ s₂ S} →  CAM-step ⟨ CONS ∷ C ∣ s₂ ∣ s₁ ∷ S ⟩     ⟨ C ∣ s₁ , s₂ ∣ S ⟩
-  cur-red  : ∀ {C C' s S} →   CAM-step ⟨ cur C ∷ C' ∣ s ∣ S ⟩         ⟨ C' ∣ cur C s ∣ S ⟩
-  app-red  : ∀ {C C' s t S} → CAM-step ⟨ app ∷ C' ∣ cur C s , t ∣ S ⟩ ⟨ C ++ C' ∣ s , t ∣ S ⟩
+  natE-red : ∀ {i s x} →         CAM-step ⟨ (NAT x) ∷ i ∣ ⟨⟩ ∣ s ⟩           ⟨ i ∣ `nat x ∣ s ⟩
+  nat-red :  ∀ {i e s x} →       CAM-step ⟨ (NAT x) ∷ i ∣ e ∣ s ⟩           ⟨ i ∣ e , `nat x ∣ s ⟩
+  skip-red : ∀ {i e s} →         CAM-step ⟨ SKIP ∷ i ∣ e ∣ s ⟩              ⟨ i ∣ e ∣ s ⟩ 
+  car-red  : ∀ {i e₁ e₂ s} →     CAM-step ⟨ CAR ∷ i ∣ e₁ , e₂ ∣ s ⟩         ⟨ i ∣ e₁ ∣ s ⟩
+  cdr-red  : ∀ {i e₁ e₂ s} →     CAM-step ⟨ CDR ∷ i ∣ e₁ , e₂ ∣ s ⟩         ⟨ i ∣ e₂ ∣ s ⟩
+  push-red : ∀ {i e s} →         CAM-step ⟨ PUSH ∷ i ∣ e ∣ s ⟩              ⟨ i ∣ e ∣ e ∷ s ⟩
+  swap-red : ∀ {i e₁ e₂ s} →     CAM-step ⟨ SWAP ∷ i ∣ e₁ ∣ e₂ ∷ s ⟩        ⟨ i ∣ e₂ ∣ e₁ ∷ s ⟩
+  cons-red : ∀ {i e₁ e₂ s} →     CAM-step ⟨ CONS ∷ i ∣ e₂ ∣ e₁ ∷ s ⟩        ⟨ i ∣ e₁ , e₂ ∣ s ⟩
+  cur-red  : ∀ {i₁ i₂ e s} →     CAM-step ⟨ CUR i₁ ∷ i₂ ∣ e ∣ s ⟩           ⟨ i₂ ∣ cur i₁ e ∣ s ⟩
+  app-red  : ∀ {i₁ i₂ e₁ e₂ s} → CAM-step ⟨ APP ∷ i₁ ∣ cur i₂ e₁ , e₂ ∣ s ⟩ ⟨ i₂ ++ i₁ ∣ e₁ , e₂ ∣ s ⟩
 
 data CAM-tr : Config → Config → Set where
   refl  : ∀ {M} → CAM-tr M M
   trans : ∀ {L N M} → CAM-tr M N → CAM-step L M → CAM-tr L N 
 
 data Finished : Config → Set where
-  empty : ∀ {env} → Finished ⟨ [] ∣ env ∣ [] ⟩
+  empty : ∀ {e} → Finished ⟨ [] ∣ e ∣ [] ⟩
 
 data Result (C : Config) : Set where
   done : Finished C → Result C
   stuck : Result C
-
-
