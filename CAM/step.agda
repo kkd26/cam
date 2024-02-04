@@ -7,7 +7,6 @@ open import CAM.config public
 open import CAM.value public
 
 data CAM-step : Config → Config → Set where
-  natE-red : ∀ {i s x} →         CAM-step ⟨ (NAT x) ∷ i ∣ ⟨⟩ ∣ s ⟩           ⟨ i ∣ `nat x ∣ s ⟩
   nat-red :  ∀ {i e s x} →       CAM-step ⟨ (NAT x) ∷ i ∣ e ∣ s ⟩           ⟨ i ∣ e , `nat x ∣ s ⟩
   skip-red : ∀ {i e s} →         CAM-step ⟨ SKIP ∷ i ∣ e ∣ s ⟩              ⟨ i ∣ e ∣ s ⟩ 
   car-red  : ∀ {i e₁ e₂ s} →     CAM-step ⟨ CAR ∷ i ∣ e₁ , e₂ ∣ s ⟩         ⟨ i ∣ e₁ ∣ s ⟩

@@ -1,7 +1,7 @@
 module CAM.proof.termination where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (sym; cong)
+open Eq using (_≡_; refl; sym; cong)
 open import Data.List
 open import Data.List.Properties
 
@@ -9,12 +9,10 @@ open import CAM.step
 open import CAM.catComb
 open import CAM.catCombProps renaming (fromCatCombToMachineValue to toValue)
 
-appInstruction-step : ∀ {i e₁ e₂} → CAM-step ⟨ APP ∷ [] ∣ cur i e₁ , e₂ ∣ [] ⟩
-      ⟨ i ∣ e₁ , e₂ ∣ [] ⟩
+appInstruction-step : ∀ {i e₁ e₂} → CAM-step ⟨ APP ∷ [] ∣ cur i e₁ , e₂ ∣ [] ⟩ ⟨ i ∣ e₁ , e₂ ∣ [] ⟩
 appInstruction-step {i} {e₁} {e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ i)) = app-red
 
 appendOneInstruction : ∀ {i i₁ i₂ e₁ e₂ s₁ s₂} → CAM-step ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM-step ⟨ i₁ ++ [ i ] ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ++ [ i ] ∣ e₂ ∣ s₂ ⟩
-appendOneInstruction natE-red = natE-red
 appendOneInstruction nat-red = nat-red
 appendOneInstruction skip-red = skip-red
 appendOneInstruction car-red = car-red
@@ -34,7 +32,6 @@ splitInstructions {[]} refl x = x
 splitInstructions {_ ∷ _} (trans x xs) y = trans (splitInstructions x y) (appendInstructions xs)
 
 stackAppendOneValue-step : ∀ {i₁ i₂ e₁ e₂ s₁ s₂ s'} → CAM-step ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM-step ⟨ i₁ ∣ e₁ ∣ s₁ ++ [ s' ] ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ++ [ s' ] ⟩
-stackAppendOneValue-step natE-red = natE-red
 stackAppendOneValue-step nat-red = nat-red
 stackAppendOneValue-step skip-red = skip-red
 stackAppendOneValue-step car-red = car-red
@@ -53,14 +50,35 @@ stackAppendValues : ∀ {s₁ s₂ s' i₁ i₂ e₁ e₂} → CAM-tr ⟨ i₁ �
 stackAppendValues {s₁} {s₂} {[]} x rewrite ++-identityʳ s₁ | ++-identityʳ s₂ = x
 stackAppendValues {s₁} {s₂} {s ∷ s'} x rewrite sym (++-assoc s₁ [ s ] s') | sym (++-assoc s₂ [ s ] s') = stackAppendValues (stackAppendOneValue-tr x)
 
-proof : ∀ {f : CatComb} → {s t : CatCombValue} → ⟨ f ∣ s ⟩= t → CAM-tr ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
-proof ev-id = trans refl skip-red
-proof (ev-comp f₁ f₂) with proof f₁ | proof f₂
+terminate : ∀ {f : CatComb} → {s t : CatCombValue} → ⟨ f ∣ s ⟩= t → CAM-tr ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
+terminate ev-id = trans refl skip-red
+terminate (ev-comp f₁ f₂) with terminate f₁ | terminate f₂
 ... | x | y = splitInstructions x y
-proof (ev-pair f₁ f₂) with proof f₁ | proof f₂
+terminate (ev-pair f₁ f₂) with terminate f₁ | terminate f₂
 ... | x | y = trans (splitInstructions (stackAppendValues x) (trans (splitInstructions (stackAppendValues y) (trans refl cons-red)) swap-red)) push-red
-proof ev-p1 = trans refl car-red
-proof ev-p2 = trans refl cdr-red
-proof ev-cur = trans refl cur-red
-proof (ev-app f) with proof f
+terminate ev-p1 = trans refl car-red
+terminate ev-p2 = trans refl cdr-red
+terminate ev-cur = trans refl cur-red
+terminate (ev-app f) with terminate f
 ... | x = trans x appInstruction-step
+
+uniqueness : ∀ {f : CatComb} → {s t t' : CatCombValue} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
+uniqueness ev-id ev-id = refl
+uniqueness (ev-comp x x₁) (ev-comp y y₁) rewrite uniqueness x y = uniqueness x₁ y₁
+uniqueness (ev-pair x x₁) (ev-pair {s₁ = s₁} y y₁) with uniqueness x y | uniqueness x₁ y₁
+... | z | w rewrite z = cong (s₁ ,_) w
+uniqueness ev-p1 ev-p1 = refl
+uniqueness ev-p2 ev-p2 = refl
+uniqueness ev-cur ev-cur = refl
+uniqueness (ev-app x) (ev-app y) = uniqueness x y
+
+deterministicStep : ∀ {a b c : Config} →  CAM-step a b → CAM-step a c → b ≡ c
+deterministicStep nat-red nat-red = refl
+deterministicStep skip-red skip-red = refl
+deterministicStep car-red car-red = refl
+deterministicStep cdr-red cdr-red = refl
+deterministicStep push-red push-red = refl
+deterministicStep swap-red swap-red = refl
+deterministicStep cons-red cons-red = refl
+deterministicStep cur-red cur-red = refl
+deterministicStep app-red app-red = refl
