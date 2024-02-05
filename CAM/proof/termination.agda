@@ -8,6 +8,7 @@ open import Data.List.Properties
 open import CAM.step
 open import CAM.catComb
 open import CAM.catCombProps renaming (fromCatCombToMachineValue to toValue)
+open import CAM.term
 
 appInstruction-step : ∀ {i e₁ e₂} → CAM-step ⟨ APP ∷ [] ∣ cur i e₁ , e₂ ∣ [] ⟩ ⟨ i ∣ e₁ , e₂ ∣ [] ⟩
 appInstruction-step {i} {e₁} {e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ i)) = app-red
@@ -50,7 +51,8 @@ stackAppendValues : ∀ {s₁ s₂ s' i₁ i₂ e₁ e₂} → CAM-tr ⟨ i₁ �
 stackAppendValues {s₁} {s₂} {[]} x rewrite ++-identityʳ s₁ | ++-identityʳ s₂ = x
 stackAppendValues {s₁} {s₂} {s ∷ s'} x rewrite sym (++-assoc s₁ [ s ] s') | sym (++-assoc s₂ [ s ] s') = stackAppendValues (stackAppendOneValue-tr x)
 
-terminate : ∀ {f : CatComb} → {s t : CatCombValue} → ⟨ f ∣ s ⟩= t → CAM-tr ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
+terminate : ∀ {A B s t} {f : CatComb (A ⇒ B)} → ⟨ f ∣ s ⟩= t → CAM-tr ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
+terminate ev-nat = trans refl nat-red
 terminate ev-id = trans refl skip-red
 terminate (ev-comp f₁ f₂) with terminate f₁ | terminate f₂
 ... | x | y = splitInstructions x y
@@ -62,7 +64,8 @@ terminate ev-cur = trans refl cur-red
 terminate (ev-app f) with terminate f
 ... | x = trans x appInstruction-step
 
-uniqueness : ∀ {f : CatComb} → {s t t' : CatCombValue} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
+uniqueness : ∀ {A B s t t'} {f : CatComb (A ⇒ B)} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
+uniqueness ev-nat ev-nat = refl
 uniqueness ev-id ev-id = refl
 uniqueness (ev-comp x x₁) (ev-comp y y₁) rewrite uniqueness x y = uniqueness x₁ y₁
 uniqueness (ev-pair x x₁) (ev-pair {s₁ = s₁} y y₁) with uniqueness x y | uniqueness x₁ y₁

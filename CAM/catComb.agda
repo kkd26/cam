@@ -6,12 +6,12 @@ open import CAM.term
 
 infix 5 _∘_
 
-data CatComb : Set where
-  nat : ℕ → CatComb
-  id : CatComb
-  _∘_ : CatComb → CatComb → CatComb
-  ⟨_,_⟩ : CatComb → CatComb → CatComb
-  p₁ : CatComb
-  p₂ : CatComb
-  cur : CatComb → CatComb
-  app : CatComb
+data CatComb : Type → Set where
+  nat : ∀ {A} → ℕ → CatComb (A ⇒ nat)
+  id : ∀ {A} → CatComb (A ⇒ A)
+  _∘_ : ∀ {A B C} → CatComb (B ⇒ C) → CatComb (A ⇒ B) → CatComb (A ⇒ C)
+  ⟨_,_⟩ : ∀ {C A B} → CatComb (C ⇒ A) → CatComb (C ⇒ B) → CatComb (C ⇒ (A × B))
+  p₁ : ∀ {A B} → CatComb ((A × B) ⇒ A)
+  p₂ : ∀ {A B} → CatComb ((A × B) ⇒ B)
+  cur : ∀ {A B C} → CatComb ((A × B) ⇒ C) → CatComb (A ⇒ B ⇒ C)
+  app : ∀ {A B} → CatComb ((A ⇒ B × A) ⇒ B)
