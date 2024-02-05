@@ -17,3 +17,12 @@ inst1 = compile ex1
 
 x : Result
 x = run ⟨ inst1 ∣ ⟨⟩ ∣ [] ⟩
+
+ex2 : ∅ ⊢ nat × nat
+ex2 = case (inr (`nat 2)) inl (# 0 , `nat 4) inr (# 0 , `nat 3)
+
+inst2 : List Inst
+inst2 = compile ex2
+
+x2 : Result
+x2 = run ⟨ inst2 ∣ ⟨⟩ ∣ [] ⟩

@@ -16,3 +16,8 @@ data ⟨_∣_⟩=_ : ∀ {A B} → CatComb A B → CatCombValue A → CatCombVal
   ev-p2 : ∀ {A B} {s₁ : CatCombValue A} {s₂ : CatCombValue B} → ⟨ p₂ ∣ s₁ , s₂ ⟩= s₂
   ev-cur : ∀ {A B C s} {f : CatComb (A × B) C} → ⟨ cur f ∣ s ⟩= cur f s
   ev-app : ∀ {A B C s t s₁} {f : CatComb (A × B) C} → ⟨ f ∣ s , t ⟩= s₁ → ⟨ app ∣ cur f s , t ⟩= s₁
+--- COPRODUCT ---
+  ev-copair1 : ∀ {A B C D s₁ s₂ t} {f : CatComb (A × B) D} {g : CatComb (A × C) D} → ⟨ f ∣ s₁ , s₂ ⟩= t → ⟨ [_,_] f g ∣ s₁ , L s₂ ⟩= t
+  ev-copair2 : ∀ {A B C D s₁ s₂ t} {f : CatComb (A × B) D} {g : CatComb (A × C) D} → ⟨ g ∣ s₁ , s₂ ⟩= t → ⟨ [_,_] f g ∣ s₁ , R s₂ ⟩= t
+  ev-i1 : ∀ {A B} {s : CatCombValue A} → ⟨ i1 {A} {B} ∣ s ⟩= (L s)
+  ev-i2 : ∀ {A B} {s : CatCombValue B} → ⟨ i2 {A} {B} ∣ s ⟩= (R s)

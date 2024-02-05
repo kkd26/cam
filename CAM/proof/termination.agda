@@ -14,6 +14,12 @@ open Type
 appInstruction-step : ∀ {i e₁ e₂} → CAM→ ⟨ APP ∷ [] ∣ cur i e₁ , e₂ ∣ [] ⟩ ⟨ i ∣ e₁ , e₂ ∣ [] ⟩
 appInstruction-step {i} {e₁} {e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ i)) = app-step
 
+case1Instruction-step : ∀ {f g e₁ e₂} → CAM→ ⟨ CASE f g ∷ [] ∣ e₁ , L e₂ ∣ [] ⟩ ⟨ f ∣ e₁ , e₂ ∣ [] ⟩
+case1Instruction-step {f = f} {e₁ = e₁} {e₂ = e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ f)) = case1-step
+
+case2Instruction-step : ∀ {f g e₁ e₂} → CAM→ ⟨ CASE f g ∷ [] ∣ e₁ , R e₂ ∣ [] ⟩ ⟨ g ∣ e₁ , e₂ ∣ [] ⟩
+case2Instruction-step {g = g} {e₁ = e₁} {e₂ = e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ g)) = case2-step
+
 appendOneInstruction : ∀ {i i₁ i₂ e₁ e₂ s₁ s₂} → CAM→ ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM→ ⟨ i₁ ++ [ i ] ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ++ [ i ] ∣ e₂ ∣ s₂ ⟩
 appendOneInstruction unit-step = unit-step
 appendOneInstruction nat-step = nat-step
@@ -25,6 +31,11 @@ appendOneInstruction swap-step = swap-step
 appendOneInstruction cons-step = cons-step
 appendOneInstruction cur-step = cur-step
 appendOneInstruction {i} (app-step {i₁} {i₂}) rewrite ++-assoc i₂ i₁ [ i ] = app-step
+--- SUM TYPE ---
+appendOneInstruction inl-step = inl-step
+appendOneInstruction inr-step = inr-step
+appendOneInstruction {i₃} (case1-step {i₁} {i = i}) rewrite ++-assoc i₁ i [ i₃ ] = case1-step
+appendOneInstruction {i₃} (case2-step {i₂ = i₂} {i}) rewrite ++-assoc i₂ i [ i₃ ] = case2-step
 
 appendInstructions : ∀ {i₁ i₂ i' e₁ e₂ s₁ s₂} → CAM→ ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM→ ⟨ i₁ ++ i' ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ++ i' ∣ e₂ ∣ s₂ ⟩
 appendInstructions {i₁} {i₂} {[]} x rewrite ++-identityʳ i₁ | ++-identityʳ i₂ = x
@@ -45,6 +56,11 @@ stackAppendOneValue-step swap-step = swap-step
 stackAppendOneValue-step cons-step = cons-step
 stackAppendOneValue-step cur-step = cur-step
 stackAppendOneValue-step app-step = app-step
+--- SUM TYPE ---
+stackAppendOneValue-step inl-step = inl-step
+stackAppendOneValue-step inr-step = inr-step
+stackAppendOneValue-step case1-step = case1-step
+stackAppendOneValue-step case2-step = case2-step
 
 stackAppendOneValue-tr : ∀ {i₁ i₂ e₁ e₂ s₁ s₂ s'} → CAM→* ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM→* ⟨ i₁ ∣ e₁ ∣ s₁ ++ [ s' ] ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ++ [ s' ] ⟩
 stackAppendOneValue-tr refl = refl
@@ -67,6 +83,11 @@ terminate ev-p2 = trans refl cdr-step
 terminate ev-cur = trans refl cur-step
 terminate (ev-app f) with terminate f
 ... | x = trans x appInstruction-step
+--- SUM TYPE ---
+terminate (ev-copair1 f) = trans (terminate f) case1Instruction-step
+terminate (ev-copair2 f) = trans (terminate f) case2Instruction-step
+terminate ev-i1 = trans refl inl-step
+terminate ev-i2 = trans refl inr-step
 
 uniqueness : ∀ {A B s t t'} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
 uniqueness ev-unit ev-unit = refl
@@ -79,6 +100,11 @@ uniqueness ev-p1 ev-p1 = refl
 uniqueness ev-p2 ev-p2 = refl
 uniqueness ev-cur ev-cur = refl
 uniqueness (ev-app x) (ev-app y) = uniqueness x y
+--- SUM TYPE ---
+uniqueness (ev-copair1 x) (ev-copair1 y) = uniqueness x y
+uniqueness (ev-copair2 x) (ev-copair2 y) = uniqueness x y
+uniqueness ev-i1 ev-i1 = refl
+uniqueness ev-i2 ev-i2 = refl
 
 deterministicStep : ∀ {a b c : Config} →  CAM→ a b → CAM→ a c → b ≡ c
 deterministicStep unit-step unit-step = refl
@@ -91,3 +117,8 @@ deterministicStep swap-step swap-step = refl
 deterministicStep cons-step cons-step = refl
 deterministicStep cur-step cur-step = refl
 deterministicStep app-step app-step = refl
+--- SUM TYPE ---
+deterministicStep inl-step inl-step = refl
+deterministicStep inr-step inr-step = refl
+deterministicStep case1-step case1-step = refl
+deterministicStep case2-step case2-step = refl

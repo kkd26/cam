@@ -14,3 +14,7 @@ data Inst : Set where
   PUSH : Inst
   SWAP : Inst
   CONS : Inst
+--- COPRODUCT ---
+  INL : Inst
+  INR : Inst
+  CASE : List Inst → List Inst → Inst

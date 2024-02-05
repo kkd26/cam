@@ -18,3 +18,7 @@ data CatComb : Type → Type → Set where
   p₂ : ∀ {A B} → CatComb (A × B) B
   cur : ∀ {A B C} → CatComb (A × B) C → CatComb A (B ⇒ C)
   app : ∀ {A B} → CatComb (A ⇒ B × A) B
+--- COPRODUCT ---
+  [_,_] : ∀ {A B C D} → CatComb (A × B) D → CatComb (A × C) D → CatComb (A × (B + C)) D
+  i1 : ∀ {A B} → CatComb A (A + B)
+  i2 : ∀ {A B} → CatComb B (A + B)

@@ -16,6 +16,11 @@ data CAM→ : Config → Config → Set where
   cons-step : ∀ {i e₁ e₂ s} →     CAM→ ⟨ CONS ∷ i ∣ e₂ ∣ e₁ ∷ s ⟩        ⟨ i ∣ e₁ , e₂ ∣ s ⟩
   cur-step  : ∀ {i₁ i₂ e s} →     CAM→ ⟨ CUR i₁ ∷ i₂ ∣ e ∣ s ⟩           ⟨ i₂ ∣ cur i₁ e ∣ s ⟩
   app-step  : ∀ {i₁ i₂ e₁ e₂ s} → CAM→ ⟨ APP ∷ i₁ ∣ cur i₂ e₁ , e₂ ∣ s ⟩ ⟨ i₂ ++ i₁ ∣ e₁ , e₂ ∣ s ⟩
+--- COPRODUCT ---
+  inl-step  : ∀ {i e s} →         CAM→ ⟨ INL ∷ i ∣ e ∣ s ⟩               ⟨ i ∣ L e ∣ s ⟩
+  inr-step  : ∀ {i e s} →         CAM→ ⟨ INR ∷ i ∣ e ∣ s ⟩               ⟨ i ∣ R e ∣ s ⟩
+  case1-step : ∀ {i₁ i₂ i e₁ e₂ s} →  CAM→ ⟨ CASE i₁ i₂ ∷ i ∣ e₁ , L e₂ ∣ s ⟩      ⟨ i₁ ++ i ∣ e₁ , e₂ ∣ s ⟩
+  case2-step : ∀ {i₁ i₂ i e₁ e₂ s} →  CAM→ ⟨ CASE i₁ i₂ ∷ i ∣ e₁ , R e₂ ∣ s ⟩      ⟨ i₂ ++ i ∣ e₁ , e₂ ∣ s ⟩
 
 data CAM→* : Config → Config → Set where
   refl  : ∀ {M} → CAM→* M M

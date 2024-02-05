@@ -17,6 +17,10 @@ open import CAM.inst
 ⟦ fst M ⟧ = p₁ ∘ ⟦ M ⟧
 ⟦ snd M ⟧ = p₂ ∘ ⟦ M ⟧
 ⟦ M , N ⟧ = ⟨ ⟦ M ⟧ , ⟦ N ⟧ ⟩
+--- COPRODUCT ---
+⟦ inl M ⟧ = i1 ∘ ⟦ M ⟧
+⟦ inr M ⟧ = i2 ∘ ⟦ M ⟧
+⟦ case M inl M₁ inr M₂ ⟧ = [_,_] ⟦ M₁ ⟧ ⟦ M₂ ⟧ ∘ ⟨ id , ⟦ M ⟧ ⟩
 
 code : ∀ {A B} → CatComb A B → List Inst
 code ! = [ UNIT ]
@@ -28,6 +32,9 @@ code p₁ = [ CAR ]
 code p₂ = [ CDR ]
 code (cur f) = [ CUR (code f) ]
 code app = [ APP ]
+code [ f , g ] = [ CASE (code f) (code g) ]
+code i1 = [ INL ]
+code i2 = [ INR ]
 
 compile : ∀ {Γ A} → Γ ⊢ A → List Inst
 compile M = code ⟦ M ⟧
@@ -37,3 +44,5 @@ fromCatCombToMachineValue (`nat n) = `nat n
 fromCatCombToMachineValue ⟨⟩ = ⟨⟩
 fromCatCombToMachineValue (s₁ , s₂) = fromCatCombToMachineValue s₁ , fromCatCombToMachineValue s₂
 fromCatCombToMachineValue (cur f s) = cur (code f) (fromCatCombToMachineValue s)
+fromCatCombToMachineValue (L x) = L fromCatCombToMachineValue x
+fromCatCombToMachineValue (R x) = R fromCatCombToMachineValue x

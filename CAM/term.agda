@@ -10,6 +10,8 @@ data Type : Set where
   _×_ : Type → Type → Type
   _⇒_ : Type → Type → Type
   nat : Type
+--- SUM TYPES ---
+  _+_ : Type → Type → Type
 
 infixl 5 _,_
 
@@ -46,6 +48,10 @@ data _⊢_ : Context → Type → Set where
   _·_ : ∀ {Γ A B} → Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
 --- NATURAL NUMBERS ---
   `nat_ : ∀ {Γ} → ℕ → Γ ⊢ nat
+--- COPRODUCT ---
+  inl_ : ∀ {Γ A B} → Γ ⊢ A → Γ ⊢ A + B
+  inr_ : ∀ {Γ A B} → Γ ⊢ B → Γ ⊢ A + B
+  case_inl_inr_ : ∀ {Γ A B C} → Γ ⊢ A + B → Γ , A ⊢ C → Γ , B ⊢ C → Γ ⊢ C
 
 
 module Utils where
