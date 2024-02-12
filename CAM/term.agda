@@ -17,6 +17,10 @@ data Context : Set where
   ∅ : Context
   _,_ : Context → Type → Context
 
+ctxToType : Context → Type
+ctxToType ∅ = unit
+ctxToType (Γ , A) = ctxToType Γ × A
+
 infix  4 _∋_
 infix  9 S_
 
