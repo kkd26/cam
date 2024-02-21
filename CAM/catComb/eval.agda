@@ -7,6 +7,7 @@ open Type
 open CatCombValue
 
 data ⟨_∣_⟩=_ : ∀ {A B} → CatComb A B → CatCombValue A → CatCombValue B → Set where
+  ev-unit : ∀ {A} {s : CatCombValue A} → ⟨ ! ∣ s ⟩= ⟨⟩
   ev-nat : ∀ {A x} {s : CatCombValue A} → ⟨ nat x ∣ s ⟩= (`nat x)
   ev-id : ∀ {A} {s : CatCombValue A} → ⟨ id ∣ s ⟩= s
   ev-comp : ∀ {A B C s s₁ s₂} {f : CatComb A B} {g : CatComb B C} → ⟨ f ∣ s ⟩= s₁ → ⟨ g ∣ s₁ ⟩= s₂ → ⟨ g ∘ f ∣ s ⟩= s₂

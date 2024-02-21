@@ -9,6 +9,7 @@ open Type
 infixl 5 _∘_
 
 data CatComb : Type → Type → Set where
+  ! : ∀ {A} → CatComb A unit
   nat : ∀ {A} → ℕ → CatComb A nat
   id : ∀ {A} → CatComb A A
   _∘_ : ∀ {A B C} → CatComb B C → CatComb A B → CatComb A C

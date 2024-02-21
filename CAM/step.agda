@@ -6,6 +6,7 @@ open import CAM.inst public
 open import CAM.config public
 
 data CAM→ : Config → Config → Set where
+  unit-step : ∀ {i e s} →         CAM→ ⟨ UNIT ∷ i ∣ e ∣ s ⟩              ⟨ i ∣ ⟨⟩ ∣ s ⟩
   nat-step  : ∀ {i e s x} →       CAM→ ⟨ (NAT x) ∷ i ∣ e ∣ s ⟩           ⟨ i ∣ `nat x ∣ s ⟩
   skip-step : ∀ {i e s} →         CAM→ ⟨ SKIP ∷ i ∣ e ∣ s ⟩              ⟨ i ∣ e ∣ s ⟩
   car-step  : ∀ {i e₁ e₂ s} →     CAM→ ⟨ CAR ∷ i ∣ e₁ , e₂ ∣ s ⟩         ⟨ i ∣ e₁ ∣ s ⟩

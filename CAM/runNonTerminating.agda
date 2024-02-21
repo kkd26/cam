@@ -12,8 +12,8 @@ data Result : Set where
 run : Config → Result
 run ⟨ [] ∣ env ∣ [] ⟩ = done env
 run ⟨ [] ∣ env ∣ _ ∷ _ ⟩ = stuck
-run ⟨ NAT x ∷ inst ∣ ⟨⟩ ∣ stack ⟩ = run ⟨ inst ∣ `nat x ∣ stack ⟩
-run ⟨ NAT x ∷ inst ∣ env ∣ stack ⟩ = run ⟨ inst ∣ env , `nat x ∣ stack ⟩
+run ⟨ UNIT ∷ inst ∣ e ∣ stack ⟩ = run ⟨ inst ∣ ⟨⟩ ∣ stack ⟩
+run ⟨ NAT x ∷ inst ∣ e ∣ stack ⟩ = run ⟨ inst ∣ `nat x ∣ stack ⟩
 run ⟨ SKIP ∷ inst ∣ env ∣ stack ⟩ = run ⟨ inst ∣ env ∣ stack ⟩
 run ⟨ CAR ∷ inst ∣ env , _ ∣ stack ⟩ = run ⟨ inst ∣ env ∣ stack ⟩
 run ⟨ CDR ∷ inst ∣ _ , env ∣ stack ⟩ = run ⟨ inst ∣ env ∣ stack ⟩

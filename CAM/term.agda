@@ -35,6 +35,7 @@ infix  9 `_
 infix  9 `nat_
 
 data _⊢_ : Context → Type → Set where
+  ⟨⟩ : ∀ {Γ} → Γ ⊢ unit
   `_ : ∀ {Γ A} → Γ ∋ A → Γ ⊢ A
 --- PRODUCT ---
   _,_ : ∀ {Γ A B} → Γ ⊢ A → Γ ⊢ B → Γ ⊢ A × B

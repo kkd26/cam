@@ -15,6 +15,7 @@ appInstruction-step : ∀ {i e₁ e₂} → CAM→ ⟨ APP ∷ [] ∣ cur i e₁
 appInstruction-step {i} {e₁} {e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ i)) = app-step
 
 appendOneInstruction : ∀ {i i₁ i₂ e₁ e₂ s₁ s₂} → CAM→ ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM→ ⟨ i₁ ++ [ i ] ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ++ [ i ] ∣ e₂ ∣ s₂ ⟩
+appendOneInstruction unit-step = unit-step
 appendOneInstruction nat-step = nat-step
 appendOneInstruction skip-step = skip-step
 appendOneInstruction car-step = car-step
@@ -34,6 +35,7 @@ splitInstructions {[]} refl x = x
 splitInstructions {_ ∷ _} (trans x xs) y = trans (splitInstructions x y) (appendInstructions xs)
 
 stackAppendOneValue-step : ∀ {i₁ i₂ e₁ e₂ s₁ s₂ s'} → CAM→ ⟨ i₁ ∣ e₁ ∣ s₁ ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ⟩ → CAM→ ⟨ i₁ ∣ e₁ ∣ s₁ ++ [ s' ] ⟩ ⟨ i₂ ∣ e₂ ∣ s₂ ++ [ s' ] ⟩
+stackAppendOneValue-step unit-step = unit-step
 stackAppendOneValue-step nat-step = nat-step
 stackAppendOneValue-step skip-step = skip-step
 stackAppendOneValue-step car-step = car-step
@@ -53,6 +55,7 @@ stackAppendValues {s₁} {s₂} {[]} x rewrite ++-identityʳ s₁ | ++-identity�
 stackAppendValues {s₁} {s₂} {s ∷ s'} x rewrite sym (++-assoc s₁ [ s ] s') | sym (++-assoc s₂ [ s ] s') = stackAppendValues (stackAppendOneValue-tr x)
 
 terminate : ∀ {A B s t} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → CAM→* ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
+terminate ev-unit = trans refl unit-step
 terminate ev-nat = trans refl nat-step
 terminate ev-id = trans refl skip-step
 terminate (ev-comp f₁ f₂) with terminate f₁ | terminate f₂
@@ -66,6 +69,7 @@ terminate (ev-app f) with terminate f
 ... | x = trans x appInstruction-step
 
 uniqueness : ∀ {A B s t t'} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
+uniqueness ev-unit ev-unit = refl
 uniqueness ev-nat ev-nat = refl
 uniqueness ev-id ev-id = refl
 uniqueness (ev-comp x x₁) (ev-comp y y₁) rewrite uniqueness x y = uniqueness x₁ y₁
@@ -77,6 +81,7 @@ uniqueness ev-cur ev-cur = refl
 uniqueness (ev-app x) (ev-app y) = uniqueness x y
 
 deterministicStep : ∀ {a b c : Config} →  CAM→ a b → CAM→ a c → b ≡ c
+deterministicStep unit-step unit-step = refl
 deterministicStep nat-step nat-step = refl
 deterministicStep skip-step skip-step = refl
 deterministicStep car-step car-step = refl

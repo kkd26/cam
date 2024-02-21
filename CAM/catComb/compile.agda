@@ -8,6 +8,7 @@ open import CAM.catComb public
 open import CAM.inst
 
 ⟦_⟧ : ∀ {Γ A} → Γ ⊢ A → CatComb (ctxToType Γ) A
+⟦ ⟨⟩ ⟧ = !
 ⟦ `nat n ⟧ = nat n
 ⟦ ` Z ⟧ = p₂
 ⟦ ` (S x) ⟧ = ⟦ ` x ⟧ ∘ p₁
@@ -18,6 +19,7 @@ open import CAM.inst
 ⟦ M , N ⟧ = ⟨ ⟦ M ⟧ , ⟦ N ⟧ ⟩
 
 code : ∀ {A B} → CatComb A B → List Inst
+code ! = [ UNIT ]
 code (nat n) = [ NAT n ]
 code id = [ SKIP ]
 code (g ∘ f) = code f ++ code g

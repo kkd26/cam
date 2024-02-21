@@ -48,6 +48,7 @@ nat ⊩' `nat x = ⊤
     from {.(_ ⇒ _)} {cur _ _} f = cur λ s → ⦅ proj₁ (f s) , ⦅ proj₁ (proj₂ (f s)) , from (proj₂ (proj₂ (f s))) ⦆ ⦆
 
 propA : ∀ {A B s} → (f : CatComb A B) → A ⊩ s → ∃[ t ] ⟨ f ∣ s ⟩= t ⊗ (B ⊩ t)
+propA ! _ = ⦅ ⟨⟩ , ⦅ ev-unit , unit ⦆ ⦆
 propA (nat n) _ = ⦅ (`nat n) , ⦅ ev-nat , nat ⦆ ⦆
 propA {s = s} id x = ⦅ s , ⦅ ev-id , x ⦆ ⦆
 propA (f ∘ g) x with propA g x

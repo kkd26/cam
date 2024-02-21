@@ -4,6 +4,7 @@ open import Data.Nat using (ℕ)
 open import Data.List
 
 data Inst : Set where
+  UNIT : Inst
   NAT : ℕ → Inst
   SKIP : Inst
   CAR : Inst
