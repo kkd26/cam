@@ -1,17 +1,17 @@
 module index where
 
--- Context
+-- Typing Context
 import CAM.context
 
 -- Machine
 import CAM.config
 import CAM.machine.eval
 
--- Simply Typed Lambda Calculus with DeBruijn indecies, types, context, terms
+-- Simply Typed Lambda Calculus with DeBruijn indecies, types, terms
 import CAM.stlc.term
 import CAM.stlc.type
 
--- Categotrical Cobinators
+-- Typed Categotrical Cobinators
 import CAM.stlc.catComb
 import CAM.stlc.catComb.compile
 import CAM.stlc.catComb.eval
@@ -20,16 +20,28 @@ import CAM.stlc.catComb.properities
 -- CAM machine instructions
 import CAM.stlc.inst
 
--- values - both combinator values and machine values
+-- Values - both combinator values and machine values
 import CAM.stlc.value
 
--- step relation
+-- Step relation
 import CAM.stlc.step
 
--- various proofs of the machine
+-- Various proofs of the machine
 import CAM.stlc.proof.termination
 import CAM.stlc.proof.wellTyped
+
+-- Untyped Lambda Calculus
+import CAM.untyped.type
+import CAM.untyped.context
+import CAM.untyped.term
+import CAM.untyped.catComb
+import CAM.untyped.inst
+import CAM.untyped.value
+import CAM.untyped.compile
 
 -- some examples of evaluation of the machine
 import CAM.stlc.run
 import CAM.stlc.example
+
+import CAM.untyped.run
+import CAM.untyped.example
