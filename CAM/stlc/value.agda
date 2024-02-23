@@ -1,12 +1,11 @@
-module CAM.value where
+module CAM.stlc.value where
 
 open import Data.Nat using (ℕ)
 open import Data.List using (List)
 
-open import CAM.catComb using (Type; CatComb) public
-open import CAM.inst using (Inst)
-
-open Type
+open import CAM.stlc.catComb public
+open import CAM.stlc.inst
+open import CAM.context (Type)
 
 infixl 5 _,_
 infix  9 `nat_
@@ -30,3 +29,7 @@ data CatCombValue : Type → Set where
 --- COPRODUCT ---
   L_ : ∀ {A B} → CatCombValue A → CatCombValue (A + B)
   R_ : ∀ {A B} → CatCombValue B → CatCombValue (A + B)
+
+data ValueOfContext : Context → Set where
+  empty : ValueOfContext ∅
+  cons : ∀ {Γ A} → ValueOfContext Γ → CatCombValue A → ValueOfContext (Γ , A)

@@ -1,15 +1,14 @@
-module CAM.proof.termination where
+module CAM.stlc.proof.termination where
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; sym; cong)
 open import Data.List
 open import Data.List.Properties
 
-open import CAM.step
-open import CAM.catComb.eval
-open import CAM.catComb.compile renaming (fromCatCombToMachineValue to toValue)
-
-open Type
+open import CAM.stlc.catComb.eval
+open import CAM.stlc.catComb.compile renaming (catCombValueToMachineValue to toValue)
+open import CAM.stlc.step
+open import CAM.machine.eval (CAM→) hiding (Config)
 
 appInstruction-step : ∀ {i e₁ e₂} → CAM→ ⟨ APP ∷ [] ∣ cur i e₁ , e₂ ∣ [] ⟩ ⟨ i ∣ e₁ , e₂ ∣ [] ⟩
 appInstruction-step {i} {e₁} {e₂} rewrite sym (cong ⟨_∣ e₁ , e₂ ∣ [] ⟩ (++-identityʳ i)) = app-step
@@ -70,55 +69,21 @@ stackAppendValues : ∀ {s₁ s₂ s' i₁ i₂ e₁ e₂} → CAM→* ⟨ i₁ 
 stackAppendValues {s₁} {s₂} {[]} x rewrite ++-identityʳ s₁ | ++-identityʳ s₂ = x
 stackAppendValues {s₁} {s₂} {s ∷ s'} x rewrite sym (++-assoc s₁ [ s ] s') | sym (++-assoc s₂ [ s ] s') = stackAppendValues (stackAppendOneValue-tr x)
 
-terminate : ∀ {A B s t} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → CAM→* ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
-terminate ev-unit = trans refl unit-step
-terminate ev-nat = trans refl nat-step
-terminate ev-id = trans refl skip-step
-terminate (ev-comp f₁ f₂) with terminate f₁ | terminate f₂
+catCombEval→machineEval : ∀ {A B s t} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → CAM→* ⟨ code f ∣ toValue s ∣ [] ⟩ ⟨ [] ∣ toValue t ∣ [] ⟩
+catCombEval→machineEval ev-unit = trans refl unit-step
+catCombEval→machineEval ev-nat = trans refl nat-step
+catCombEval→machineEval ev-id = trans refl skip-step
+catCombEval→machineEval (ev-comp f₁ f₂) with catCombEval→machineEval f₁ | catCombEval→machineEval f₂
 ... | x | y = splitInstructions x y
-terminate (ev-pair f₁ f₂) with terminate f₁ | terminate f₂
+catCombEval→machineEval (ev-pair f₁ f₂) with catCombEval→machineEval f₁ | catCombEval→machineEval f₂
 ... | x | y = trans (splitInstructions (stackAppendValues x) (trans (splitInstructions (stackAppendValues y) (trans refl cons-step)) swap-step)) push-step
-terminate ev-p1 = trans refl car-step
-terminate ev-p2 = trans refl cdr-step
-terminate ev-cur = trans refl cur-step
-terminate (ev-app f) with terminate f
+catCombEval→machineEval ev-p1 = trans refl car-step
+catCombEval→machineEval ev-p2 = trans refl cdr-step
+catCombEval→machineEval ev-cur = trans refl cur-step
+catCombEval→machineEval (ev-app f) with catCombEval→machineEval f
 ... | x = trans x appInstruction-step
 --- SUM TYPE ---
-terminate (ev-copair1 f) = trans (terminate f) case1Instruction-step
-terminate (ev-copair2 f) = trans (terminate f) case2Instruction-step
-terminate ev-i1 = trans refl inl-step
-terminate ev-i2 = trans refl inr-step
-
-uniqueness : ∀ {A B s t t'} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
-uniqueness ev-unit ev-unit = refl
-uniqueness ev-nat ev-nat = refl
-uniqueness ev-id ev-id = refl
-uniqueness (ev-comp x x₁) (ev-comp y y₁) rewrite uniqueness x y = uniqueness x₁ y₁
-uniqueness (ev-pair x x₁) (ev-pair {s₁ = s₁} y y₁) with uniqueness x y | uniqueness x₁ y₁
-... | z | w rewrite z = cong (s₁ ,_) w
-uniqueness ev-p1 ev-p1 = refl
-uniqueness ev-p2 ev-p2 = refl
-uniqueness ev-cur ev-cur = refl
-uniqueness (ev-app x) (ev-app y) = uniqueness x y
---- SUM TYPE ---
-uniqueness (ev-copair1 x) (ev-copair1 y) = uniqueness x y
-uniqueness (ev-copair2 x) (ev-copair2 y) = uniqueness x y
-uniqueness ev-i1 ev-i1 = refl
-uniqueness ev-i2 ev-i2 = refl
-
-deterministicStep : ∀ {a b c : Config} →  CAM→ a b → CAM→ a c → b ≡ c
-deterministicStep unit-step unit-step = refl
-deterministicStep nat-step nat-step = refl
-deterministicStep skip-step skip-step = refl
-deterministicStep car-step car-step = refl
-deterministicStep cdr-step cdr-step = refl
-deterministicStep push-step push-step = refl
-deterministicStep swap-step swap-step = refl
-deterministicStep cons-step cons-step = refl
-deterministicStep cur-step cur-step = refl
-deterministicStep app-step app-step = refl
---- SUM TYPE ---
-deterministicStep inl-step inl-step = refl
-deterministicStep inr-step inr-step = refl
-deterministicStep case1-step case1-step = refl
-deterministicStep case2-step case2-step = refl
+catCombEval→machineEval (ev-copair1 f) = trans (catCombEval→machineEval f) case1Instruction-step
+catCombEval→machineEval (ev-copair2 f) = trans (catCombEval→machineEval f) case2Instruction-step
+catCombEval→machineEval ev-i1 = trans refl inl-step
+catCombEval→machineEval ev-i2 = trans refl inr-step

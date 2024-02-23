@@ -1,11 +1,11 @@
-module CAM.example where
+module CAM.stlc.example where
 
 open import Data.List
 
-open import CAM.term
+open import CAM.stlc.term
 open import CAM.config
-open import CAM.catComb.compile
-open import CAM.runNonTerminating
+open import CAM.stlc.catComb.compile
+open import CAM.stlc.run
 
 open Utils
 
@@ -16,7 +16,7 @@ inst1 : List Inst
 inst1 = compile ex1
 
 x : Result
-x = run ⟨ inst1 ∣ ⟨⟩ ∣ [] ⟩
+x = run 100 ⟨ inst1 ∣ ⟨⟩ ∣ [] ⟩
 
 ex2 : ∅ ⊢ nat × nat
 ex2 = case (inr (`nat 2)) inl (# 0 , `nat 4) inr (# 0 , `nat 3)
@@ -25,4 +25,4 @@ inst2 : List Inst
 inst2 = compile ex2
 
 x2 : Result
-x2 = run ⟨ inst2 ∣ ⟨⟩ ∣ [] ⟩
+x2 = run 100 ⟨ inst2 ∣ ⟨⟩ ∣ [] ⟩

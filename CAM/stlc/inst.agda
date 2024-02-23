@@ -1,4 +1,4 @@
-module CAM.inst where
+module CAM.stlc.inst where
 
 open import Data.Nat using (ℕ)
 open import Data.List

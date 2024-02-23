@@ -1,9 +1,11 @@
-module CAM.catComb.eval where
+module CAM.stlc.catComb.eval where
 
-open import CAM.catComb
-open import CAM.value using (CatCombValue) public
+import Relation.Binary.PropositionalEquality as Eq
+open Eq using (_≡_; refl; sym; cong)
 
-open Type
+open import CAM.stlc.catComb public
+open import CAM.stlc.value using (CatCombValue) public
+
 open CatCombValue
 
 data ⟨_∣_⟩=_ : ∀ {A B} → CatComb A B → CatCombValue A → CatCombValue B → Set where
@@ -21,3 +23,20 @@ data ⟨_∣_⟩=_ : ∀ {A B} → CatComb A B → CatCombValue A → CatCombVal
   ev-copair2 : ∀ {A B C D s₁ s₂ t} {f : CatComb (A × B) D} {g : CatComb (A × C) D} → ⟨ g ∣ s₁ , s₂ ⟩= t → ⟨ [_,_] f g ∣ s₁ , R s₂ ⟩= t
   ev-i1 : ∀ {A B} {s : CatCombValue A} → ⟨ i1 {A} {B} ∣ s ⟩= (L s)
   ev-i2 : ∀ {A B} {s : CatCombValue B} → ⟨ i2 {A} {B} ∣ s ⟩= (R s)
+
+uniqueness : ∀ {A B s t t'} {f : CatComb A B} → ⟨ f ∣ s ⟩= t → ⟨ f ∣ s ⟩= t' → t ≡ t'
+uniqueness ev-unit ev-unit = refl
+uniqueness ev-nat ev-nat = refl
+uniqueness ev-id ev-id = refl
+uniqueness (ev-comp x x₁) (ev-comp y y₁) rewrite uniqueness x y = uniqueness x₁ y₁
+uniqueness (ev-pair x x₁) (ev-pair {s₁ = s₁} y y₁) with uniqueness x y | uniqueness x₁ y₁
+... | z | w rewrite z = cong (s₁ ,_) w
+uniqueness ev-p1 ev-p1 = refl
+uniqueness ev-p2 ev-p2 = refl
+uniqueness ev-cur ev-cur = refl
+uniqueness (ev-app x) (ev-app y) = uniqueness x y
+--- COPRODUCT ---
+uniqueness (ev-copair1 x) (ev-copair1 y) = uniqueness x y
+uniqueness (ev-copair2 x) (ev-copair2 y) = uniqueness x y
+uniqueness ev-i1 ev-i1 = refl
+uniqueness ev-i2 ev-i2 = refl

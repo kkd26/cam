@@ -1,11 +1,12 @@
-module CAM.catComb.compile where
+module CAM.stlc.catComb.compile where
 
 open import Data.List
 
-open import CAM.term
-open import CAM.value
-open import CAM.catComb public
-open import CAM.inst
+open import CAM.stlc.term
+open import CAM.stlc.value
+open import CAM.stlc.catComb public
+open import CAM.stlc.inst
+open import CAM.context
 
 ⟦_⟧ : ∀ {Γ A} → Γ ⊢ A → CatComb (ctxToType Γ) A
 ⟦ ⟨⟩ ⟧ = !
@@ -39,10 +40,15 @@ code i2 = [ INR ]
 compile : ∀ {Γ A} → Γ ⊢ A → List Inst
 compile M = code ⟦ M ⟧
 
-fromCatCombToMachineValue : ∀ {A} → CatCombValue A → MachineValue
-fromCatCombToMachineValue (`nat n) = `nat n
-fromCatCombToMachineValue ⟨⟩ = ⟨⟩
-fromCatCombToMachineValue (s₁ , s₂) = fromCatCombToMachineValue s₁ , fromCatCombToMachineValue s₂
-fromCatCombToMachineValue (cur f s) = cur (code f) (fromCatCombToMachineValue s)
-fromCatCombToMachineValue (L x) = L fromCatCombToMachineValue x
-fromCatCombToMachineValue (R x) = R fromCatCombToMachineValue x
+catCombValueToMachineValue : ∀ {A} → CatCombValue A → MachineValue
+catCombValueToMachineValue (`nat n) = `nat n
+catCombValueToMachineValue ⟨⟩ = ⟨⟩
+catCombValueToMachineValue (s₁ , s₂) = catCombValueToMachineValue s₁ , catCombValueToMachineValue s₂
+catCombValueToMachineValue (cur f s) = cur (code f) (catCombValueToMachineValue s)
+catCombValueToMachineValue (L x) = L catCombValueToMachineValue x
+catCombValueToMachineValue (R x) = R catCombValueToMachineValue x
+
+ctxToMachineValue : ∀ {Γ} → ValueOfContext Γ → MachineValue
+ctxToMachineValue empty = ⟨⟩
+ctxToMachineValue (cons x x₁) with ctxToMachineValue x | catCombValueToMachineValue x₁
+... | z | w = z , w

@@ -1,34 +1,14 @@
-module CAM.term where
+module CAM.stlc.term where
 
 open import Data.Nat using (ℕ)
 
-infixl 5 _×_
-infixr 7 _⇒_
+open import CAM.stlc.type public
 
-data Type : Set where
-  unit : Type
-  _×_ : Type → Type → Type
-  _⇒_ : Type → Type → Type
-  nat : Type
---- SUM TYPES ---
-  _+_ : Type → Type → Type
-
-infixl 5 _,_
-
-data Context : Set where
-  ∅ : Context
-  _,_ : Context → Type → Context
+open import CAM.context (Type) public
 
 ctxToType : Context → Type
 ctxToType ∅ = unit
 ctxToType (Γ , A) = ctxToType Γ × A
-
-infix  4 _∋_
-infix  9 S_
-
-data _∋_ : Context → Type → Set where
-  Z : ∀ {Γ A} → (Γ , A) ∋ A
-  S_ : ∀ {Γ A B} → Γ ∋ A → (Γ , B) ∋ A
 
 infix  4 _⊢_
 infix  5 ƛ_

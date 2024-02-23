@@ -1,13 +1,12 @@
-module CAM.proof.logicalRelation where
+module CAM.stlc.catComb.properities where
 
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; ∃; Σ-syntax; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⦅_,_⦆; _×_ to _⊗_)
 
-open import CAM.catComb.eval
-open import CAM.catComb.compile
+open import CAM.stlc.catComb.eval public
+open import CAM.stlc.catComb.compile public
 open import CAM.helper.iso using (_⇔_)
 
-open Type
 open CatCombValue
 
 infix 4 _⊩_

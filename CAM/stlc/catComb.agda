@@ -1,10 +1,8 @@
-module CAM.catComb where
+module CAM.stlc.catComb where
 
 open import Data.Nat using (ℕ)
 
-open import CAM.term using (Type) public
-
-open Type
+open import CAM.stlc.type public
 
 infixl 5 _∘_
 
