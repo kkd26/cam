@@ -39,9 +39,21 @@ import CAM.untyped.inst
 import CAM.untyped.value
 import CAM.untyped.compile
 
+-- List object and iteration
+import CAM.list.type
+import CAM.list.term
+import CAM.list.catComb
+import CAM.list.inst
+import CAM.list.value
+import CAM.list.compile
+import CAM.list.eval
+
 -- some examples of evaluation of the machine
 import CAM.stlc.run
 import CAM.stlc.example
 
 import CAM.untyped.run
 import CAM.untyped.example
+
+import CAM.list.run
+import CAM.list.example
