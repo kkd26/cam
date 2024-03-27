@@ -1,6 +1,5 @@
 *.agdai
 *~
 
-cleanup
-
 html/
+_build/

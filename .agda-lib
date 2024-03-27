@@ -1,0 +1,3 @@
+name: categorical-abstract-machine
+depend: standard-library
+include: src
