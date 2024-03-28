@@ -1,5 +1,7 @@
 *.agdai
 *~
 
+*.svg
+
 html/
 _build/
